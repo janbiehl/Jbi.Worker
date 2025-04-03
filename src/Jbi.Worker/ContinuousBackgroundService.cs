@@ -49,11 +49,11 @@ public class ContinuousBackgroundService<TIteration>(
 	{
 		if (_initialDelay.HasValue && _initialDelay.Value > TimeSpan.Zero)
 		{
-			Log.InitialDelay(_logger, _initialDelay.Value, nameof(TIteration));
+			Log.InitialDelay(_logger, _initialDelay.Value, typeof(TIteration).Name);
 			await Task.Delay(_initialDelay.Value, stoppingToken).ConfigureAwait(false);
 		}
 		
-		Log.ContinuousWorkerStart(_logger, nameof(TIteration));
+		Log.ContinuousWorkerStart(_logger, typeof(TIteration).Name);
 		Stopwatch stopwatch = new ();
 		
 		while (!stoppingToken.IsCancellationRequested)
@@ -67,20 +67,20 @@ public class ContinuousBackgroundService<TIteration>(
 				await using var scope = _scopeFactory.CreateAsyncScope();
 #pragma warning restore CA2007
 				var iteration = scope.ServiceProvider.GetRequiredService<TIteration>();
-				Log.ContinuousWorkerIteration(_logger, nameof(TIteration));
+				Log.ContinuousWorkerIteration(_logger, typeof(TIteration).Name);
 				await iteration.RunAsync(stoppingToken).ConfigureAwait(false);
 				stopwatch.Stop();
-				Log.ContinuousWorkerIterationFinish(_logger, stopwatch.Elapsed, nameof(TIteration));
+				Log.ContinuousWorkerIterationFinish(_logger, stopwatch.Elapsed, typeof(TIteration).Name);
 				stopwatch.Reset();
 			}
 #pragma warning disable CA1031
 			catch (Exception e)
 #pragma warning restore CA1031
 			{
-				Log.ContinuousWorkerException(_logger, e, nameof(TIteration));
+				Log.ContinuousWorkerException(_logger, e, typeof(TIteration).Name);
 			}
 		}
 		
-		Log.ContinuousWorkerStopped(_logger, nameof(TIteration));
+		Log.ContinuousWorkerStopped(_logger, typeof(TIteration).Name);
 	}
 }

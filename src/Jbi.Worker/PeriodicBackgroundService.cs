@@ -64,12 +64,12 @@ public class PeriodicBackgroundService<TIteration>(
 	{
 		if (_initialDelay > TimeSpan.Zero)
 		{
-			Log.InitialDelay(_logger, _initialDelay, nameof(TIteration));
+			Log.InitialDelay(_logger, _initialDelay, typeof(TIteration).Name);
 			await Task.Delay(_initialDelay, stoppingToken).ConfigureAwait(false);
 		}
 		
 		using PeriodicTimer timer = new (_period);
-		Log.PeriodicWorkerStart(_logger, _period, nameof(TIteration));
+		Log.PeriodicWorkerStart(_logger, _period, typeof(TIteration).Name);
 		
 		// The while loop will wait one period and then execute the loop.
 		// A do while loop would run immediately and wait after the first iteration 
@@ -85,20 +85,20 @@ public class PeriodicBackgroundService<TIteration>(
 #pragma warning restore CA2007
 				var iteration = scope.ServiceProvider.GetRequiredService<TIteration>();
 
-				Log.PeriodicWorkerIteration(_logger, nameof(TIteration));
+				Log.PeriodicWorkerIteration(_logger, typeof(TIteration).Name);
 				await iteration.RunAsync(stoppingToken).ConfigureAwait(false);
 				var elapsedTime = TimeProvider.System.GetElapsedTime(start);
-				Log.PeriodicWorkerIterationFinish(_logger, elapsedTime, nameof(TIteration));
+				Log.PeriodicWorkerIterationFinish(_logger, elapsedTime, typeof(TIteration).Name);
 			}
 #pragma warning disable CA1031
 			catch (Exception e)
 #pragma warning restore CA1031
 			{
-				Log.PeriodicWorkerException(_logger, e, nameof(TIteration));
+				Log.PeriodicWorkerException(_logger, e, typeof(TIteration).Name);
 			}
 		}
 
-		Log.PeriodicWorkerStopped(_logger, nameof(TIteration));
+		Log.PeriodicWorkerStopped(_logger, typeof(TIteration).Name);
 	}
 #else
 	/// <inheritdoc />
@@ -106,11 +106,11 @@ public class PeriodicBackgroundService<TIteration>(
 	{
 		if (_initialDelay > TimeSpan.Zero)
 		{
-			Log.InitialDelay(_logger, _initialDelay, nameof(TIteration));
+			Log.InitialDelay(_logger, _initialDelay, typeof(TIteration).Name);
 			await Task.Delay(_initialDelay, stoppingToken).ConfigureAwait(false);
 		}
 
-		Log.PeriodicWorkerStart(_logger, _period, nameof(TIteration));
+		Log.PeriodicWorkerStart(_logger, _period, typeof(TIteration).Name);
 		Stopwatch stopwatch = new ();
 		
 		while (!stoppingToken.IsCancellationRequested)
@@ -125,7 +125,7 @@ public class PeriodicBackgroundService<TIteration>(
 #pragma warning restore CA2007
 				var iteration = scope.ServiceProvider.GetRequiredService<TIteration>();
 
-				Log.PeriodicWorkerIteration(_logger, nameof(TIteration));
+				Log.PeriodicWorkerIteration(_logger, typeof(TIteration).Name);
 				var iterationTask = iteration.RunAsync(stoppingToken);
 				var delayTask = Task.Delay(_period, stoppingToken);
 
@@ -134,17 +134,17 @@ public class PeriodicBackgroundService<TIteration>(
 				// the next iteration
 				await Task.WhenAll(iterationTask, delayTask).ConfigureAwait(false);
 				stopwatch.Stop();
-				Log.PeriodicWorkerIterationFinish(_logger, stopwatch.Elapsed, nameof(TIteration));
+				Log.PeriodicWorkerIterationFinish(_logger, stopwatch.Elapsed, typeof(TIteration).Name);
 				stopwatch.Reset();
 			}
 #pragma warning disable CA1031
 			catch (Exception e)
 #pragma warning restore CA1031
 			{
-				Log.PeriodicWorkerException(_logger, e, nameof(TIteration));
+				Log.PeriodicWorkerException(_logger, e, typeof(TIteration).Name);
 			}
 
-			Log.PeriodicWorkerStopped(_logger, nameof(TIteration));
+			Log.PeriodicWorkerStopped(_logger, typeof(TIteration).Name);
 		}
 	}
 #endif
