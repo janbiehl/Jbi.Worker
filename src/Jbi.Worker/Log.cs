@@ -21,7 +21,9 @@ internal static partial class Log
 	
 	[LoggerMessage(LogLevel.Error, "An exception occurred during periodic worker execution: {IterationTypeName}")]
 	internal static partial void PeriodicWorkerException(ILogger logger, Exception exception, string iterationTypeName);
-	
+
+	[LoggerMessage(LogLevel.Warning, "The execution of the periodic worker {IterationTypeName} has taken longer than its configured period of {Period}")]
+	internal static partial void PeriodicWorkerDurationExceedsPeriod(ILogger logger, TimeSpan period, string iterationTypeName);
 	
 	[LoggerMessage(LogLevel.Information, "Continuous worker of type {IterationTypeName} starting")]
 	internal static partial void ContinuousWorkerStart(ILogger logger, string iterationTypeName);

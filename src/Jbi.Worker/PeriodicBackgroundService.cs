@@ -89,6 +89,9 @@ public class PeriodicBackgroundService<TIteration>(
 				await iteration.RunAsync(stoppingToken).ConfigureAwait(false);
 				var elapsedTime = TimeProvider.System.GetElapsedTime(start);
 				Log.PeriodicWorkerIterationFinish(_logger, elapsedTime, typeof(TIteration).Name);
+
+				if (elapsedTime > _period)
+					Log.PeriodicWorkerDurationExceedsPeriod(_logger, _period, typeof(TIteration).Name);
 			}
 #pragma warning disable CA1031
 			catch (Exception e)
